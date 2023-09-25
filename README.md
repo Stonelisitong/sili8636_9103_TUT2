@@ -2,10 +2,10 @@
 ## Part 1: Imaging Technique Inspiration
 I was inspired by *[The Work of Michael Murphy](https://www.perceptualart.com/)*.\
 This illusion art achieves a 3D visual effect through perspective and distortion.\
-![Anamorphic Art 1](readmeImages/Anamorphic%20Art%201.png)\
-![Anamorphic Art 2](readmeImages/Anamorphic%20Art%202.png)\
-![Anamorphic Art 3](readmeImages/Anamorphic%20Art%203.png)\
-![Anamorphic Art 4](readmeImages/Anamorphic%20Art%204.png)\
+![Anamorphic Art 1](readmeImages/Anamorphic%20Art%201.png)
+![Anamorphic Art 2](readmeImages/Anamorphic%20Art%202.png)
+![Anamorphic Art 3](readmeImages/Anamorphic%20Art%203.png)
+![Anamorphic Art 4](readmeImages/Anamorphic%20Art%204.png)
 
 These artworks gave me some ideas for my work:\
 -I hope to incorporate this **3D Visual Effect** into my project. This technology helps to give artworks depth, extending beyond just the screen of a mobile phone.\
