@@ -1,6 +1,7 @@
 # Quiz 8
 ## Part 1: Imaging Technique Inspiration
-I was inspired by *[The Work of Michael Murphy](https://www.perceptualart.com/)*. This illusion art achieves a 3D visual effect through perspective and distortion.\
+I was inspired by *[The Work of Michael Murphy](https://www.perceptualart.com/)*.\
+This illusion art achieves a 3D visual effect through perspective and distortion.\
 ![Anamorphic Art 1](readmeImages/Anamorphic%20Art%201.png)\
 ![Anamorphic Art 2](readmeImages/Anamorphic%20Art%202.png)\
 ![Anamorphic Art 3](readmeImages/Anamorphic%20Art%203.png)\
