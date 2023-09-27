@@ -17,7 +17,7 @@ I found coding techniques on *[p5.js-Orbit Control](https://p5js.org/examples/3d
 ![Orbit2](readmeImages/Orbit2.png)
 
 I can set up a 3D camera using Orbit Control. This technology allows users to appreciate the artwork from a **First-person Perspective**. \
-Graphic fragments are designed to be placed in a 3D space. When users **Orbit, Pan, and Zoom** the camera, they can discover the image formed by the fragments and deeply experience the **Immersive Feeling** brought by the artwork.\
+Graphic fragments are designed to be placed in a 3D space. When users **Orbit, Pan, and Zoom** the camera, they can discover the image formed by the fragments and deeply experience the **Immersive Feeling** brought by the artwork.
 
 Here is one more *[Complementary Coding Techniques](https://github.com/mrdoob/three.js/blob/ce0b3d0415c4bc87a8b4ad01c5d21cc26c6ec5eb/examples/webgl_materials_toon.html)*\
-![Threejs](readmeImages/Threejs.png)
+![Threejs](readmeImages/Threejs.png) using three.js.
