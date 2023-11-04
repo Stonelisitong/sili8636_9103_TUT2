@@ -232,3 +232,5 @@ function draw() {
   noFill();
   makeGrid();// Use the makeGrid function
 }
+
+//This code is debuged by ChatGPT
