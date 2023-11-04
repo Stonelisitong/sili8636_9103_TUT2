@@ -3,6 +3,8 @@ let colorsList = []; // Define a two-dimensional array and use it to store the c
 let angle = 0;  // Define a variable to store the angle of rotation
 let rotating = false;  // Define a variable to store whether the rotation is enabled
 let mousePressedTime;  // Define a variable to store the time when the mouse is pressed
+let dragging = false; // Define a variable to store whether the mouse is dragging
+
 
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight); // Create a canvas that fills the window
@@ -273,20 +275,25 @@ function mouseClicked() {
   // Go through all stored colors and change them
   for (let row = 0; row < colorsList.length; row++) {
     for (let col = 0; col < (colorsList[row] ? colorsList[row].length : 0); col++) {
+      let currentColors = colorsList[row][col];
       let colorsForThisSet = [];
-      
-      // Add new color for twisted thread
-      colorsForThisSet.push(color(random(255), random(255), random(255)));
 
-      // Add new colors for concentric circles
-      for (let r of radii) {
-        colorsForThisSet.push(color(random(255), random(255), random(255)));
+      // Calculate new color for twisted thread with lerp
+      let newColor = color(random(255), random(255), random(255));
+      colorsForThisSet.push(lerpColor(currentColors[0], newColor, 0.9)); // Lerp the color
+
+      // Calculate new colors for concentric circles with lerp
+      for (let i = 0; i < radii.length; i++) {
+        newColor = color(random(255), random(255), random(255));
+        colorsForThisSet.push(lerpColor(currentColors[i+1], newColor, 0.9)); // Lerp the color
       }
 
-      // Add new colors for the small dots between concentric circles
-      colorsForThisSet.push(color(random(255), random(255), random(255)));
-      colorsForThisSet.push(color(random(255), random(255), random(255)));
-      colorsForThisSet.push(color(random(255), random(255), random(255)));
+      // Calculate new colors for the small dots between concentric circles with lerp
+      for (let i = 0; i < 3; i++) { // Assuming there are always 3 dots
+        newColor = color(random(255), random(255), random(255));
+        let indexOffset = 1 + radii.length; // Offset for the twisted thread and concentric circles
+        colorsForThisSet.push(lerpColor(currentColors[indexOffset + i], newColor, 0.9)); // Lerp the color
+      }
 
       // Update the colors in the colors list
       colorsList[row][col] = colorsForThisSet;
@@ -297,10 +304,12 @@ function mouseClicked() {
   redraw();
 }
 
+
 function mousePressed() {
   // When the mouse is pressed, record the current time
   mousePressedTime = millis();
   rotating = true;
+  dragging = true;
   loop(); //Make sure the draw function is called continuously
 }
 
@@ -310,6 +319,7 @@ function mouseReleased() {
   mousePressedTime = 0; 
   //Reset the time
   rotating = false;
+  dragging = false; 
   noLoop(); 
 }
 
@@ -324,15 +334,44 @@ function mouseInHexagon(mx, my, hexX, hexY, hexSize) {
   return d < hexSize;
 }
 
+function mouseDragged() {
+  if (dragging) {
+    let difference = mouseX - pmouseX; // Calculate the difference since the last frame
+
+    // Loop through all the radii and update them based on the mouse movement
+    for (let i = 0; i < radii.length; i++) {
+      // Increase or decrease the radius based on the direction of mouse movement
+      radii[i] = max(radii[i] + difference * 0.03, windowWidth/40); // Ensure the radius doesn't go below 0
+    }
+
+    // Redraw the sketch with updated radii
+    redraw();
+  }
+  return false; // Prevent default behavior and event propagation
+}
 
 function draw() {
-  background(4, 81, 123);//Set canvas color to dark blue
-  translate(width / 2, height / 2); // Move the coordinate system to the center of the canvas
-  rotate(15);// Rotate the entire canvas 15 degrees to fit the design of the original image
-  stroke(255);// Set the stroke color to white
-  noFill();
-  makeGrid();// Use the makeGrid function
-  if (!rotating) { // If the rotation is stopped, stop the draw function
+  background(4, 81, 123); 
+
+  // Move the origin to the center of the canvas
+  translate(width / 2, height / 2); 
+  rotate(15); 
+
+  stroke(255); 
+  noFill(); 
+  makeGrid(); 
+
+  // Reset the transformation matrix，so that the rectangle is created at the bottom of the canvas
+  resetMatrix();
+
+  // Draw a light blue rectangle at the bottom of the canvas
+  fill(198, 226, 237, 248); 
+  // Make it a little bit transparent
+
+  noStroke(); 
+  rect(0, height - 100, width, 100); 
+
+  if (!rotating) { 
     noLoop();
   }
 }
