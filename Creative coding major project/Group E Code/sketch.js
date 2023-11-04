@@ -27,7 +27,7 @@ function windowResized() {
 
 // Define a function to draw six white dots with orange and brown edges at the vertices of the hexagon
 // Then draw the hexagonal honeycomb grid with twisted lines
-function drawTwistedLine(cX, cY, r, col, row) {
+function drawTwistedLine(cX, cY, r, row, col) {
   // Get the current position’s color list
   let colors = getColorsForPosition(row, col);
   // Set the first color of the list as the fill color
@@ -102,7 +102,7 @@ function drawTwistedLine(cX, cY, r, col, row) {
 }
 
 // Define a function to draw concentric circles and dotted rings
-function drawConcentricCirclesAndDots(cX, cY, radii, col, row) {
+function drawConcentricCirclesAndDots(cX, cY, radii, row, col) {
   // Get the color list of the current location
   let colors = getColorsForPosition(row, col);
   new ConcentricCirclesAndDots(cX, cY, radii, colors).draw();
@@ -215,9 +215,9 @@ function makeGrid() {
       let hexCenterY = y;
 
       // Call the drawTwistedLine function to draw twisted lines 
-      drawTwistedLine(hexCenterX, hexCenterY, hexagonSize / 2, col, row);
+      drawTwistedLine(hexCenterX, hexCenterY, hexagonSize / 2, row, col);
       // Call drawConcentricCircles function to draw concentric circles and dotted rings
-      drawConcentricCirclesAndDots(hexCenterX, hexCenterY, radii, col, row);
+      drawConcentricCirclesAndDots(hexCenterX, hexCenterY, radii, row, col);
     }
     count++;// increment every row
   }
