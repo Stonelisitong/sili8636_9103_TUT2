@@ -1,5 +1,8 @@
 let radii;//Define an array and use it to store the radii of concentric circles.
 let colorsList = []; // Define a two-dimensional array and use it to store the colours at each position.
+let angle = 0;  // Define a variable to store the angle of rotation
+let rotating = false;  // Define a variable to store whether the rotation is enabled
+let mousePressedTime;  // Define a variable to store the time when the mouse is pressed
 
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight); // Create a canvas that fills the window
@@ -17,6 +20,8 @@ function setup() {
 
   // Initialize a set of redii for concentric circles
   radii = [hexagonSize * 0.4, hexagonSize * 0.25, hexagonSize * 0.1];
+  // Initialize the time when the mouse is pressed to 0
+  mousePressedTime = 0;
   redraw();
 }
 
@@ -102,10 +107,10 @@ function drawTwistedLine(cX, cY, r, row, col) {
 }
 
 // Define a function to draw concentric circles and dotted rings
-function drawConcentricCirclesAndDots(cX, cY, radii, row, col) {
+function drawConcentricCirclesAndDetails(cX, cY, radii, row, col) {
   // Get the color list of the current location
   let colors = getColorsForPosition(row, col);
-  new ConcentricCirclesAndDots(cX, cY, radii, colors).draw();
+  new ConcentricCirclesAndDetails(cX, cY, radii, colors).draw();
 }
 
 // Define a class to draw dotted circles
@@ -135,7 +140,7 @@ class DottedCircle {
 }
 
 // Define a class to draw concentric circles and dotted rings
-class ConcentricCirclesAndDots {
+class ConcentricCirclesAndDetails {
   constructor(cX, cY, radii, colors) {
     this.cX = cX;
     this.cY = cY;
@@ -147,12 +152,35 @@ class ConcentricCirclesAndDots {
 // draw three concentric circles and the small dots between the concentric circles
   draw() {
     push();
-
     // Loop through the three sets of data in the radius array
     // and draw concentric circles using the stored colours
     for (let i = 0; i < this.radii.length; i++) {
       fill(this.colors[i + 1]);
       ellipse(this.cX, this.cY, this.radii[i] * 2, this.radii[i] * 2);
+    }
+    
+  
+    // Draw a radius line on the largest circle
+    push();
+    strokeWeight(5);
+    // Use the first color for the line 
+    stroke(this.colors[0]); 
+    // Calculate the end point of the line based on the current angle
+    let endX = this.cX + this.radii[0] * cos(angle);
+    let endY = this.cY + this.radii[0] * sin(angle);
+    line(this.cX, this.cY, endX, endY); 
+    pop();
+
+    // When the mouse is pressed for greater than 1 second, 
+    // a straight line starts to rotate with the centre of the circle as a fixed point..
+    if (mouseIsPressed && !rotating) {
+      if (millis() - mousePressedTime > 1000) { 
+      rotating = true;
+      }
+    }
+  
+    if (rotating) {
+      angle += 0.01; // Increase the angle by 0.01 each time
     }
 
     // Calculate the radii of three rings formed by small dots
@@ -217,10 +245,51 @@ function makeGrid() {
       // Call the drawTwistedLine function to draw twisted lines 
       drawTwistedLine(hexCenterX, hexCenterY, hexagonSize / 2, row, col);
       // Call drawConcentricCircles function to draw concentric circles and dotted rings
-      drawConcentricCirclesAndDots(hexCenterX, hexCenterY, radii, row, col);
+      drawConcentricCirclesAndDetails(hexCenterX, hexCenterY, radii, row, col);
     }
     count++;// increment every row
   }
+}
+
+// When the mouse is clicked, the colors are randomly changed
+function mouseClicked() {
+  // Go through all stored colors and change them
+  for (let row = 0; row < colorsList.length; row++) {
+    for (let col = 0; col < (colorsList[row] ? colorsList[row].length : 0); col++) {
+      let colorsForThisSet = [];
+      
+      // Add new color for twisted thread
+      colorsForThisSet.push(color(random(255), random(255), random(255)));
+
+      // Add new colors for concentric circles
+      for (let r of radii) {
+        colorsForThisSet.push(color(random(255), random(255), random(255)));
+      }
+
+      // Add new colors for the small dots between concentric circles
+      colorsForThisSet.push(color(random(255), random(255), random(255)));
+      colorsForThisSet.push(color(random(255), random(255), random(255)));
+      colorsForThisSet.push(color(random(255), random(255), random(255)));
+
+      // Update the colors in the colors list
+      colorsList[row][col] = colorsForThisSet;
+    }
+  }
+
+  // Redraw the grid with new colors
+  redraw();
+}
+
+function mousePressed() {
+  // When the mouse is pressed, record the current time
+  mousePressedTime = millis();
+}
+
+function mouseReleased() {
+  // When the mouse is released, stop the rotation
+  rotating = false;
+  mousePressedTime = 0; 
+  //Reset the time
 }
 
 
