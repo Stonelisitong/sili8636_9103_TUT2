@@ -19,7 +19,7 @@ function setup() {
   angleMode(DEGREES);
 
   // Initialize a set of redii for concentric circles
-  radii = [hexagonSize * 0.4, hexagonSize * 0.25, hexagonSize * 0.1];
+  radii = [hexagonSize * 0.38, hexagonSize * 0.25, hexagonSize * 0.1];
   // Initialize the time when the mouse is pressed to 0
   mousePressedTime = 0;
   redraw();
@@ -35,6 +35,10 @@ function windowResized() {
 function drawTwistedLine(cX, cY, r, row, col) {
   // Get the current position’s color list
   let colors = getColorsForPosition(row, col);
+  if (mouseInHexagon(mouseX - width / 2, mouseY - height / 2, cX, cY, r)) {
+    // If the mouse is in the hexagon
+    colors[0] = color(255); // Set the first color of the list to white
+  }
   // Set the first color of the list as the fill color
   fill(colors[0]);
 
@@ -169,29 +173,42 @@ class ConcentricCirclesAndDetails {
     let endX = this.cX + this.radii[0] * cos(angle);
     let endY = this.cY + this.radii[0] * sin(angle);
     line(this.cX, this.cY, endX, endY); 
+
+    // Draw two arc between the smallest circle and the middle circle
+    let arcRadius_1 = this.radii[0] * 0.5;
+    // Set the stroke and fill for the arc
+    stroke(0, 168,168); // Set the color of the arc
+    strokeWeight(5); 
+    noFill(); // Ensure the arc isn't filled
+    arc(this.cX, this.cY, arcRadius_1 * 2, arcRadius_1 * 2, 90 + angle, 180 + angle, OPEN); 
+
+    let arcRadius_2 = this.radii[0] * 0.55;
+    // Set the stroke and fill for the arc
+    stroke(0, 255, 255); // Set the color of the arc
+    strokeWeight(6); 
+    noFill(); // Ensure the arc isn't filled
+    arc(this.cX, this.cY, arcRadius_2 * 2, arcRadius_2 * 2, 180 + angle, 450 + angle, OPEN); // Draw the arc
     pop();
 
     // When the mouse is pressed for greater than 1 second, 
     // a straight line starts to rotate with the centre of the circle as a fixed point..
     if (mouseIsPressed && !rotating) {
-      if (millis() - mousePressedTime > 1000) { 
       rotating = true;
-      }
     }
   
     if (rotating) {
-      angle += 0.01; // Increase the angle by 0.01 each time
+      angle += 0.05; // Increase the angle by 0.05 each time
     }
 
     // Calculate the radii of three rings formed by small dots
     let r1 = (this.radii[0] + this.radii[1]) / 2 * 0.85;
-    let r2 = r1 * 1.15;
-    let r3 = r2 * 1.15
+    let r2 = r1 * 1.12;
+    let r3 = r2 * 1.14
 
     // Draw dotted rings
     new DottedCircle(this.cX, this.cY, r1, r1 * 0.1, this.colors[4]).draw();
-    new DottedCircle(this.cX, this.cY, r2, r1 * 0.12, this.colors[5]).draw();
-    new DottedCircle(this.cX, this.cY, r3, r1 * 0.13, this.colors[6]).draw();
+    new DottedCircle(this.cX, this.cY, r2, r1 * 0.1, this.colors[5]).draw();
+    new DottedCircle(this.cX, this.cY, r3, r1 * 0.1, this.colors[6]).draw();
     
     pop();
   }
@@ -283,6 +300,8 @@ function mouseClicked() {
 function mousePressed() {
   // When the mouse is pressed, record the current time
   mousePressedTime = millis();
+  rotating = true;
+  loop(); //Make sure the draw function is called continuously
 }
 
 function mouseReleased() {
@@ -290,6 +309,19 @@ function mouseReleased() {
   rotating = false;
   mousePressedTime = 0; 
   //Reset the time
+  rotating = false;
+  noLoop(); 
+}
+
+function mouseMoved() {
+  loop();
+  redraw();
+}
+
+function mouseInHexagon(mx, my, hexX, hexY, hexSize) {
+  // Calculate wheather the mouse is in the hexagon
+  let d = dist(mx, my, hexX, hexY);
+  return d < hexSize;
 }
 
 
@@ -300,6 +332,9 @@ function draw() {
   stroke(255);// Set the stroke color to white
   noFill();
   makeGrid();// Use the makeGrid function
+  if (!rotating) { // If the rotation is stopped, stop the draw function
+    noLoop();
+  }
 }
 
 //This code is debuged by ChatGPT
