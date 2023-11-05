@@ -4,13 +4,24 @@ let angle = 0;  // Define a variable to store the angle of rotation
 let rotating = false;  // Define a variable to store whether the rotation is enabled
 let mousePressedTime;  // Define a variable to store the time when the mouse is pressed
 let dragging = false; // Define a variable to store whether the mouse is dragging
+let gif; // Define variables for loading and creating GIFs
+let xFirePosition; 
+let yFirePosition; // Define variables for the position of the GIF
+let gridWidth;  
+let gridHeight; // Define variables for the width and height of the grid
+let hexCenterX;
+let hexCenterY; // Define variables for the center coordinates of the hexagon
+
+
+function preload() {  // Load GIFs 
+  gif = loadImage("gif/fire.gif");
+}
 
 
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight); // Create a canvas that fills the window
   canvas.style('display', 'block');// Set the display of the canvas to 'block' to avoid layout confusion of the graphics
   
-
   // Initialize grid width, height and size of hexagons
   gridWidth = windowWidth;
   gridHeight = windowHeight;
@@ -24,13 +35,20 @@ function setup() {
   radii = [hexagonSize * 0.38, hexagonSize * 0.25, hexagonSize * 0.1];
   // Initialize the time when the mouse is pressed to 0
   mousePressedTime = 0;
+
+  xFirePosition = windowWidth * 0.9;
+  yFirePosition = windowHeight * 0.85;
   redraw();
+
 }
 
 // Adjust the size of the canvas when the window is resized
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  xFirePosition = windowWidth * 0.9;
+  yFirePosition = windowHeight * 0.85;
 }
+
 
 // Define a function to draw six white dots with orange and brown edges at the vertices of the hexagon
 // Then draw the hexagonal honeycomb grid with twisted lines
@@ -177,16 +195,17 @@ class ConcentricCirclesAndDetails {
     line(this.cX, this.cY, endX, endY); 
 
     // Draw two arc between the smallest circle and the middle circle
+    // Reference code from https://editor.p5js.org/ri1/sketches/9KYDDY328
     let arcRadius_1 = this.radii[0] * 0.5;
     // Set the stroke and fill for the arc
-    stroke(0, 168,168); // Set the color of the arc
+    stroke(0, 100,168); // Set the color of the arc
     strokeWeight(5); 
     noFill(); // Ensure the arc isn't filled
     arc(this.cX, this.cY, arcRadius_1 * 2, arcRadius_1 * 2, 90 + angle, 180 + angle, OPEN); 
 
     let arcRadius_2 = this.radii[0] * 0.55;
     // Set the stroke and fill for the arc
-    stroke(0, 255, 255); // Set the color of the arc
+    stroke(0, 230, 255); // Set the color of the arc
     strokeWeight(6); 
     noFill(); // Ensure the arc isn't filled
     arc(this.cX, this.cY, arcRadius_2 * 2, arcRadius_2 * 2, 180 + angle, 450 + angle, OPEN); // Draw the arc
@@ -226,7 +245,7 @@ function getColorsForPosition(row, col) {
   if (!colorsList[row][col]) {
     let colorsForThisSet = [];
     
-    // Add color to wrapped thread
+    // Add color to twisted thread
     colorsForThisSet.push(color(random(255), random(255), random(255)));
 
     // Add color to concentric circles
@@ -270,29 +289,28 @@ function makeGrid() {
   }
 }
 
+
 // When the mouse is clicked, the colors are randomly changed
 function mouseClicked() {
-  // Go through all stored colors and change them
+  // Iterate through all stored colors and change them directly
   for (let row = 0; row < colorsList.length; row++) {
     for (let col = 0; col < (colorsList[row] ? colorsList[row].length : 0); col++) {
-      let currentColors = colorsList[row][col];
       let colorsForThisSet = [];
 
-      // Calculate new color for twisted thread with lerp
+      // Calculate new color for twisted thread
       let newColor = color(random(255), random(255), random(255));
-      colorsForThisSet.push(lerpColor(currentColors[0], newColor, 0.9)); // Lerp the color
+      colorsForThisSet.push(newColor);
 
-      // Calculate new colors for concentric circles with lerp
+      // Calculate new colors for concentric circles
       for (let i = 0; i < radii.length; i++) {
         newColor = color(random(255), random(255), random(255));
-        colorsForThisSet.push(lerpColor(currentColors[i+1], newColor, 0.9)); // Lerp the color
+        colorsForThisSet.push(newColor);
       }
 
-      // Calculate new colors for the small dots between concentric circles with lerp
+      // Calculate new colors for the small dots between concentric circles
       for (let i = 0; i < 3; i++) { // Assuming there are always 3 dots
         newColor = color(random(255), random(255), random(255));
-        let indexOffset = 1 + radii.length; // Offset for the twisted thread and concentric circles
-        colorsForThisSet.push(lerpColor(currentColors[indexOffset + i], newColor, 0.9)); // Lerp the color
+        colorsForThisSet.push(newColor);
       }
 
       // Update the colors in the colors list
@@ -300,9 +318,10 @@ function mouseClicked() {
     }
   }
 
-  // Redraw the grid with new colors
+  // Redraw the grid with updated colors
   redraw();
 }
+
 
 
 function mousePressed() {
@@ -350,29 +369,64 @@ function mouseDragged() {
   return false; // Prevent default behavior and event propagation
 }
 
+function keyPressed() {
+  // When the arrow keys are pressed, move the fire gif
+  if (keyCode === LEFT_ARROW) {
+    xFirePosition -= 10; // Move the fire gif to the left
+  } else if (keyCode === RIGHT_ARROW) {
+    xFirePosition += 10; // Move the fire gif to the right
+  } else if (keyCode === UP_ARROW) {
+    yFirePosition -= 10; // Move the fire gif up
+  } else if (keyCode === DOWN_ARROW) {
+    yFirePosition += 10; // Move the fire gif down
+  }
+}
+
 function draw() {
   background(4, 81, 123); 
-
+ 
   // Move the origin to the center of the canvas
   translate(width / 2, height / 2); 
   rotate(15); 
 
   stroke(255); 
   noFill(); 
-  makeGrid(); 
+  
+    makeGrid();
 
   // Reset the transformation matrix，so that the rectangle is created at the bottom of the canvas
   resetMatrix();
 
   // Draw a light blue rectangle at the bottom of the canvas
-  fill(198, 226, 237, 248); 
+  push();
+  fill(198, 226, 237); 
   // Make it a little bit transparent
-
   noStroke(); 
-  rect(0, height - 100, width, 100); 
+  rect(0, height - 100, width, 100);
+  pop();
 
-  if (!rotating) { 
-    noLoop();
+  push();
+  fill(255);
+  stroke(0);
+  strokeWeight(3);
+  circle(width/2, height - 50, 70);
+  pop();
+
+  push();
+  fill(0);
+  noStroke();
+  rect(width/2 - 5, height - 50, 5, 30);
+  pop();
+
+  push();
+  fill(0);
+  noStroke();
+  rect(width/2 - 5, height - 50, 25, 5);
+  pop();
+  
+  image(gif, xFirePosition, yFirePosition, width/15, height/6); // Draw GIF
+  if (image){
+    loop();
   }
 }
 
