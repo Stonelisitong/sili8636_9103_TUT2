@@ -2,19 +2,23 @@ let radii;//Define an array and use it to store the radii of concentric circles.
 let colorsList = []; // Define a two-dimensional array and use it to store the colours at each position.
 let angle = 0;  // Define a variable to store the angle of rotation
 let rotating = false;  // Define a variable to store whether the rotation is enabled
+let rotateRate = 0.05; // Define a variable to store the rotation rate 
 let mousePressedTime;  // Define a variable to store the time when the mouse is pressed
 let dragging = false; // Define a variable to store whether the mouse is dragging
 let gif; // Define variables for loading and creating GIFs
-let xFirePosition; 
-let yFirePosition; // Define variables for the position of the GIF
+let img; // Define variables for loading and creating Images
+let xHandPosition; 
+let yHandPosition; // Define variables for the position of the GIF
 let gridWidth;  
 let gridHeight; // Define variables for the width and height of the grid
 let hexCenterX;
 let hexCenterY; // Define variables for the center coordinates of the hexagon
+let button; // Define variables for the button
 
 
 function preload() {  // Load GIFs 
-  gif = loadImage("gif/fire.gif");
+  gif = loadImage("gif/hand.gif");
+  img = loadImage("image/Wheels.jpg");
 }
 
 
@@ -36,8 +40,12 @@ function setup() {
   // Initialize the time when the mouse is pressed to 0
   mousePressedTime = 0;
 
-  xFirePosition = windowWidth * 0.9;
-  yFirePosition = windowHeight * 0.85;
+  xHandPosition = windowWidth * 0.93;
+  yHandPosition = windowHeight * 0.88;
+
+  let refreshButton = createButton('Refresh');
+  refreshButton.position(windowWidth * 0.02, windowHeight * 0.96);
+  refreshButton.mousePressed(refreshSketch);
   redraw();
 
 }
@@ -45,8 +53,9 @@ function setup() {
 // Adjust the size of the canvas when the window is resized
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  xFirePosition = windowWidth * 0.9;
-  yFirePosition = windowHeight * 0.85;
+
+  xHandPosition = windowWidth * 0.93;
+  yHandPosition = windowHeight * 0.88;
 }
 
 
@@ -216,9 +225,10 @@ class ConcentricCirclesAndDetails {
     if (mouseIsPressed && !rotating) {
       rotating = true;
     }
+
   
     if (rotating) {
-      angle += 0.05; // Increase the angle by 0.05 each time
+      angle += rotateRate; // Increase the angle by 0.05 each time
     }
 
     // Calculate the radii of three rings formed by small dots
@@ -370,16 +380,25 @@ function mouseDragged() {
 }
 
 function keyPressed() {
-  // When the arrow keys are pressed, move the fire gif
-  if (keyCode === LEFT_ARROW) {
-    xFirePosition -= 10; // Move the fire gif to the left
-  } else if (keyCode === RIGHT_ARROW) {
-    xFirePosition += 10; // Move the fire gif to the right
-  } else if (keyCode === UP_ARROW) {
-    yFirePosition -= 10; // Move the fire gif up
-  } else if (keyCode === DOWN_ARROW) {
-    yFirePosition += 10; // Move the fire gif down
-  }
+  // When the arrow keys are pressed, move the hand gif
+  if (keyIsDown(LEFT_ARROW)) {
+    xHandPosition -= 10; // Move the gif to the left
+  } else if (keyIsDown(RIGHT_ARROW)) {
+    xHandPosition += 10; // Move the gif to the right
+  } else if (keyIsDown(UP_ARROW)) {
+    yHandPosition -= 10; // Move the gif up
+  } else if (keyIsDown(DOWN_ARROW)) {
+    yHandPosition += 10; // Move the gif down
+  } else if (keyIsDown(87)) {
+    rotateRate += 0.05; // Increase the rotation rate
+  } else if (keyIsDown(83)) {
+    rotateRate -= 0.05; //  Decrease the rotation rate
+}
+}
+
+function refreshSketch() {
+  // Reload the page to refresh the sketch
+  window.location.reload();
 }
 
 function draw() {
@@ -405,6 +424,7 @@ function draw() {
   rect(0, height - 100, width, 100);
   pop();
 
+  // Draw a clock at the bottom of the canvas
   push();
   fill(255);
   stroke(0);
@@ -423,11 +443,45 @@ function draw() {
   noStroke();
   rect(width/2 - 5, height - 50, 25, 5);
   pop();
-  
-  image(gif, xFirePosition, yFirePosition, width/15, height/6); // Draw GIF
+
+  //Add text to the bottom of the canvas to illustrate the current rotation rate of the controled details 
+  textSize(12);
+  fill(4, 81, 123);
+  text(`Current Rotation Rate: ${rotateRate.toFixed(2)}`, windowWidth * 0.55, windowHeight * 0.975); // Display the rotation rate
+
+  //Add the instruction of the interaction to the bottom of the canvas
+  textSize(14);
+  fill(0);
+  textWrap(WORD)
+  text(`1. Click to change the colour of the picture except the canvas.
+  2. Long press the mouse and the wheel starts to rotate.
+  3. Hold down the mouse and drag left and right to control the size of the wheel.
+  4. Move the mouse over the screen to see the changes in the twisted lines`, windowWidth * 0.08, windowHeight * 0.89, windowWidth/2.5, windowHeight/5); // Display the instruction
+
+  textSize(14);
+  fill(0);
+  textWrap(WORD)
+  text(`5. Press the w/s key to control the rotation rate
+  6. Press the arrow keys to move the hand, when it coincides with the circular clock in the bottom centre of the canvas, you can see the original image of this piece of artwork`, windowWidth * 0.55, windowHeight * 0.89, windowWidth/2.5, windowHeight/5); // Display the instruction
+
+
+
+  image(img, windowWidth * 0.025, windowHeight * 0.89, width/30, height/15); // Draw a original image in the left bottom corner
+
+  // Check the hand gif is/ is not on the circle clock
+  if (xHandPosition >= width/2 - 40 && xHandPosition <= width/2 + 40 &&
+  yHandPosition >= height - 100 && yHandPosition <= height) {
+clear(); // If the hand is on the circle clock, clear the entire canvas
+image(img, 0, 0, width, height * 2); // Then, show the original image
+}
+
+  image(gif, xHandPosition, yHandPosition, width/20, height/10); // Draw GIF
   if (image){
     loop();
   }
+
+
+  keyPressed();
 }
 
 //This code is debuged by ChatGPT
